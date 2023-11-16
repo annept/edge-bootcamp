@@ -1,35 +1,38 @@
-import { createOptimizedPicture } from '../../scripts/aem.js';
+import { createOptimizedPicture } from "../../scripts/aem.js";
 
 async function loadIndex() {
-   const indexResponse = await fetch('/query-index.json');
-   if (!indexResponse.ok) {
-       return;
-   }
+  const indexResponse = await fetch("/query-index.json");
+  if (!indexResponse.ok) {
+    return;
+  }
 
-   return indexResponse;
+  return indexResponse;
 }
 
 export default async function decorate(block) {
- const indexResponse = await loadIndex();
+  const indexResponse = await loadIndex();
 
- const category = block.querySelector(':scope div:nth-child(1) > div').innerHTML;
- const index = await indexResponse.json();
- const container = document.createElement('ul');
- container.classList.add('category-list');
- container.classList.add(`category-list--${category}`);
+  const category = block.querySelector(
+    ":scope div:nth-child(1) > div"
+  ).innerHTML;
+  const index = await indexResponse.json();
+  const container = document.createElement("ul");
+  container.classList.add("category-list");
+  container.classList.add(`category-list--${category}`);
 
- index.data
-   .forEach((post) => {
-     if (post.type !== category) {
-       return;
-     }
-     console.log(post.featured ? 'true' : 'false')
-     if(!post.featured) {
-       const li = document.createElement('li');
-       const picture = createOptimizedPicture(post.image, '', false, [{ width: 500 }]);
-       const date = post['lastModified'];
+  index.data.forEach((post) => {
+    if (post.type !== category) {
+      return;
+    }
+    console.log(post.featured ? "true" : "false");
+    if (!post.featured) {
+      const li = document.createElement("li");
+      const picture = createOptimizedPicture(post.image, "", false, [
+        { width: 500 },
+      ]);
+      const date = post["lastModified"];
 
-       li.innerHTML = `
+      li.innerHTML = `
        <a href="${post.path}">
            <div class="picture">
            ${picture.outerHTML}
@@ -40,10 +43,9 @@ export default async function decorate(block) {
            </div>
        </a>
        `;
-       container.append(li);
-     }
+      container.append(li);
+    }
+  });
 
-   });
-
- block.innerHTML = container.outerHTML;
+  block.innerHTML = container.outerHTML;
 }
